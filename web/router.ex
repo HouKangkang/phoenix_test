@@ -32,6 +32,10 @@ defmodule HelloPhoenix.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+  end
+
+  pipeline :auth_api do
+    plug :accepts, ["json"]
     plug :auth_plug
   end
 
