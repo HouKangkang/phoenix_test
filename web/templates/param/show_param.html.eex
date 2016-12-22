@@ -1,0 +1,4 @@
+<div class="jumbotron">
+  <h2>This is the param I got from you: </h2>
+  <p> <%= inspect @param%> </p>
+</div>
