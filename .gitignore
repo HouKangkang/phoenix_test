@@ -1,3 +1,4 @@
+
 # App artifacts
 /_build
 /db
@@ -26,3 +27,6 @@ erl_crash.dump
 .idea
 hellophoenix.iml
 
+
+test/channels/
+web/static/vendor/
