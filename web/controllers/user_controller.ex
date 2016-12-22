@@ -96,4 +96,15 @@ defmodule HelloPhoenix.UserController do
 
   end
 
+
+  def user_detail(conn, %{"user_id" => user_id}) do
+    user = Repo.get(User, user_id)
+    IO.puts inspect user
+    api_suc(conn, 200, User.to_dict(user))
+  end
+
+  def logout(conn, %{"token" => token}) do
+#    remove the token from cache
+  end
+
 end

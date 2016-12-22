@@ -43,34 +43,40 @@ defmodule HelloPhoenix.Router do
 
 
 
-  scope "/", HelloPhoenix do
-    pipe_through :browser # Use the default browser stack
+#  scope "/", HelloPhoenix do
+#    pipe_through :browser # Use the default browser stack
 
-    get "/", PageController, :index
-    get "/hello", HelloController, :index
-	get "/hello/:messager", HelloController, :show
-#	get "/", RootController, :index
-    get "/test", PageController, :test
+#    get "/", PageController, :index
+#    get "/hello", HelloController, :index
+#	get "/hello/:messager", HelloController, :show
+##	get "/", RootController, :index
+#    get "/test", PageController, :test
+#
+#	resources "/users", UserController, except: [:index] do
+#	  resources "/porsts", PostController
+#	end
+#	resources "/reviews", ReviewController
 
-	resources "/users", UserController, except: [:index] do
-	  resources "/porsts", PostController
-	end
-	resources "/reviews", ReviewController
+#    get "/copy_param_page", ParamController, :copy_param_page
 
-    get "/copy_param_page", ParamController, :copy_param_page
-
-    resources "/users", UserController
-  end
+#    resources "/users", UserController
+#  end
 
   scope "/", HelloPhoenix do
     pipe_through :api
     get "/copy_param", ParamController, :copy_param
   end
 
-  scope "/users", HelloPhoenix, as: :users do
+  scope "/users", HelloPhoenix do
     pipe_through :api
     post "/register", UserController, :register
     post "/login", UserController, :login
+  end
+
+  scope "/users", HelloPhoenix do
+    pipe_through :auth_api
+    get "/:user_id", UserController, :user_detail
+    delete "/logout", UserController, :logout
   end
 
 
