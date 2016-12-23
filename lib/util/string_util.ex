@@ -7,7 +7,7 @@ defmodule HelloPhoenix.Util.StringUtil do
   end
 
   def uuid() do
-     UUID.uuid4 ()
+     UUID.uuid4()
   end
 
 

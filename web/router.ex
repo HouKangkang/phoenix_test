@@ -3,6 +3,7 @@ defmodule HelloPhoenix.Router do
   use HelloPhoenix.Web, :common
 
   import HelloPhoenix.Util.StringUtil
+  alias HelloPhoenix.Common.Redis.RedisClient
 
 
   pipeline :browser do
@@ -23,7 +24,7 @@ defmodule HelloPhoenix.Router do
     IO.puts("query_params: #{inspect query_params}")
 
     token = Map.get(query_params, "token")
-    if not is_nil_or_empty token do
+    if not is_nil_or_empty RedisClient.run(~w"GET #{token}") do
       conn
     else
       conn |> api_err(401, "please login first")
