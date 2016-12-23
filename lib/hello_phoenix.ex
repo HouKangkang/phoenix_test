@@ -14,6 +14,8 @@ defmodule HelloPhoenix do
       supervisor(HelloPhoenix.Endpoint, []),
       # Start your own worker by calling: HelloPhoenix.Worker.start_link(arg1, arg2, arg3)
       # worker(HelloPhoenix.Worker, [arg1, arg2, arg3]),
+      supervisor(HelloPhoenix.Common.Redis.RedisClientSupervisor, [])
+
     ]
 
     # See http://elixir-lang.org/docs/stable/elixir/Supervisor.html

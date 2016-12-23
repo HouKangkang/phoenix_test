@@ -37,19 +37,6 @@ defmodule HelloPhoenix.Web do
       import HelloPhoenix.Router.Helpers
       import HelloPhoenix.Gettext
 
-      def api_err(conn, status_code, err) do
-        conn
-        |> put_status(status_code)
-        |> render(HelloPhoenix.SharedView, "shared.json", %{"code" => status_code, "err" => err})
-      end
-
-      def api_suc(conn, status_code, data) do
-#        IO.puts("in api_suc #{inspect data}")
-        conn
-        |> put_status(status_code)
-        |> render(HelloPhoenix.SharedView, "shared.json", %{"code" => status_code, "data" => data})
-      end
-
     end
   end
 

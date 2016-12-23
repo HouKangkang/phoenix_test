@@ -30,3 +30,4 @@ hellophoenix.iml
 
 test/channels/
 web/static/vendor/
+dump.rdb
