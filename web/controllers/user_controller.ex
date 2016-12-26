@@ -85,17 +85,17 @@ defmodule HelloPhoenix.UserController do
   end
 
   def login(conn, %{"username" => username, "password" => password} = _params) do
-    query = from u in "users", where: u.name == ^username, select: {u.name, u.password, u.salt}, limit: 1
+    query = from u in "users", where: u.name == ^username, select: {u.id, u.name, u.password, u.salt}, limit: 1
 
     user = Repo.one(query)
 #    first(query, nil)
 #
 #    user = query |> first |> Repo.one!
 
-    input_pwd = PasswordUtil.generate_password(password, elem(user, 2))
-    if input_pwd == elem(user, 1) do
+    input_pwd = PasswordUtil.generate_password(password, elem(user, 3))
+    if input_pwd == elem(user, 2) do
         token = StringUtil.uuid
-        RedisClient.run(~w(SET #{token} #{user.id}))
+        RedisClient.run(~w(SET #{token} #{elem(user, 0)}))
         api_suc(conn, 200, token)
     else
         api_err(conn, 400, "Access denied")
