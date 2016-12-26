@@ -6,7 +6,7 @@ defmodule HelloPhoenix.UserSocket do
 
   ## Channels
   channel "room:*", HelloPhoenix.RoomChannel
-  channel "users_socket:*", HelloPhoenix.UserChannel
+  channel "users_socket:*", HelloPhoenix.CommonChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -26,8 +26,8 @@ defmodule HelloPhoenix.UserSocket do
   def connect(params, socket) do
     IO.puts("socket params: #{inspect params}")
     token = params["token"]
-    user_id = RedisClient.run(~w"GET #{token}")
-#    user_id = token
+#    user_id = RedisClient.run(~w"GET #{token}")
+    user_id = token
     if not is_nil_or_empty user_id do
       IO.puts("assign user_id to socket: #{user_id}")
       {:ok, assign(socket, :user_id, user_id)}

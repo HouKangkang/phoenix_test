@@ -57,6 +57,7 @@ socket.connect()
 // Now that you are connected, you can join channels with a topic:
 let channel = socket.channel("room:lobby", {})
 let user_channel = socket.channel("users_socket:" + user_id)
+
 let chatInput         = document.querySelector("#chat-input")
 let messagesContainer = document.querySelector("#messages")
 
@@ -73,6 +74,13 @@ channel.on("new_msg", payload => {
     messagesContainer.appendChild(messageItem)
 })
 
+user_channel.on("new_msg", payload => {
+    let messageItem = document.createElement("li");
+    messageItem.innerText = `[${Date()}] ${payload.body} ${payload.topic}`
+    messagesContainer.appendChild(messageItem)
+})
+
+
 user_channel.on("invited", payload => {
     let messageItem = document.createElement("li");
     messageItem.innerText = `[${Date()}] ${payload.body}`
@@ -87,5 +95,8 @@ channel.join()
 user_channel.join()
     .receive("ok", resp => { console.log("Joined Users successfully", resp) })
     .receive("error", resp => { console.log("Unable to join users", resp) })
+
+user_channel.push("watch", {topic: "12345"})
+user_channel.push("watch", {topic: "54321"})
 
 export default socket
