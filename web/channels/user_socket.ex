@@ -2,7 +2,8 @@ defmodule HelloPhoenix.UserSocket do
   use Phoenix.Socket
 
   ## Channels
-   channel "room:*", HelloPhoenix.RoomChannel
+  channel "room:*", HelloPhoenix.RoomChannel
+  channel "users:*", HelloPhoenix.UserChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -33,5 +34,5 @@ defmodule HelloPhoenix.UserSocket do
   #     HelloPhoenix.Endpoint.broadcast("users_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
-  def id(_socket), do: nil
+  def id(_socket), do: "users_sockets:1"
 end

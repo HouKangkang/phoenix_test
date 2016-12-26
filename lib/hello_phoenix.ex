@@ -8,13 +8,13 @@ defmodule HelloPhoenix do
 
     # Define workers and child supervisors to be supervised
     children = [
+      supervisor(HelloPhoenix.Common.Redis.RedisClientSupervisor, []),
       # Start the Ecto repository
       supervisor(HelloPhoenix.Repo, []),
       # Start the endpoint when the application starts
-      supervisor(HelloPhoenix.Endpoint, []),
+      supervisor(HelloPhoenix.Endpoint, [])
       # Start your own worker by calling: HelloPhoenix.Worker.start_link(arg1, arg2, arg3)
       # worker(HelloPhoenix.Worker, [arg1, arg2, arg3]),
-      supervisor(HelloPhoenix.Common.Redis.RedisClientSupervisor, [])
 
     ]
 

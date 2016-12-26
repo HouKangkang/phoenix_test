@@ -44,24 +44,24 @@ defmodule HelloPhoenix.Router do
 
 
 
-#  scope "/", HelloPhoenix do
-#    pipe_through :browser # Use the default browser stack
+  scope "/", HelloPhoenix do
+    pipe_through :browser # Use the default browser stack
 
-#    get "/", PageController, :index
-#    get "/hello", HelloController, :index
-#	get "/hello/:messager", HelloController, :show
-##	get "/", RootController, :index
-#    get "/test", PageController, :test
-#
-#	resources "/users", UserController, except: [:index] do
-#	  resources "/porsts", PostController
-#	end
-#	resources "/reviews", ReviewController
+    get "/", PageController, :index
+    get "/hello", HelloController, :index
+	get "/hello/:messager", HelloController, :show
+#	get "/", RootController, :index
+    get "/test", PageController, :test
 
-#    get "/copy_param_page", ParamController, :copy_param_page
+	resources "/users", UserController, except: [:index] do
+	  resources "/porsts", PostController
+	end
+	resources "/reviews", ReviewController
 
-#    resources "/users", UserController
-#  end
+    get "/copy_param_page", ParamController, :copy_param_page
+
+    resources "/users", UserController
+  end
 
   scope "/", HelloPhoenix do
     pipe_through :api
