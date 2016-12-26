@@ -31,3 +31,4 @@ hellophoenix.iml
 test/channels/
 web/static/vendor/
 dump.rdb
+config/dev.exs
