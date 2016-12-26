@@ -6,7 +6,7 @@ defmodule HelloPhoenix.UserSocket do
 
   ## Channels
   channel "room:*", HelloPhoenix.RoomChannel
-  channel "users_socket:*", HelloPhoenix.UserChannel
+  channel "users_socket:*", HelloPhoenix.CommonChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
