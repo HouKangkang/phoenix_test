@@ -48,25 +48,22 @@ defmodule HelloPhoenix.Router do
     pipe_through :browser # Use the default browser stack
 
     get "/", PageController, :index
-    get "/hello", HelloController, :index
-	get "/hello/:messager", HelloController, :show
-#	get "/", RootController, :index
-    get "/test", PageController, :test
-
-	resources "/users", UserController, except: [:index] do
-	  resources "/porsts", PostController
-	end
-	resources "/reviews", ReviewController
-
-    get "/copy_param_page", ParamController, :copy_param_page
-
-    resources "/users", UserController
+#    get "/hello", HelloController, :index
+#	get "/hello/:messager", HelloController, :show
+##	get "/", RootController, :index
+#    get "/test", PageController, :test
+#	resources "/users", UserController, except: [:index] do
+#	  resources "/porsts", PostController
+#	end
+#	resources "/reviews", ReviewController
+#    get "/copy_param_page", ParamController, :copy_param_page
+#    resources "/users", UserController
   end
 
-  scope "/", HelloPhoenix do
-    pipe_through :api
-    get "/copy_param", ParamController, :copy_param
-  end
+#  scope "/", HelloPhoenix do
+#    pipe_through :api
+#    get "/copy_param", ParamController, :copy_param
+#  end
 
   scope "/users", HelloPhoenix do
     pipe_through :api
@@ -78,6 +75,17 @@ defmodule HelloPhoenix.Router do
     pipe_through :auth_api
     get "/:user_id", UserController, :user_detail
     delete "/logout", UserController, :logout
+
+    get "/:user_id/rooms", UserController, :user_rooms
+
+
+  end
+
+  scope "/rooms", HelloPhoenix do
+#    pipe_through :auth_api
+    pipe_through :api
+    post "/", RoomController, :create
+    get "/", RoomController, :all_rooms
   end
 
 

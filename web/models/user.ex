@@ -9,6 +9,8 @@ defmodule HelloPhoenix.User do
     field :password, :string
     field :salt, :string
 
+#    many_to_many :rooms, HelloPhoenix.Room, join_through: "user_rooms"
+
     timestamps()
   end
 

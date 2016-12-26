@@ -1,9 +1,12 @@
 defmodule HelloPhoenix.UserSocket do
   use Phoenix.Socket
+  import HelloPhoenix.Util.StringUtil
+
+  alias HelloPhoenix.Common.Redis.RedisClient
 
   ## Channels
   channel "room:*", HelloPhoenix.RoomChannel
-  channel "users:*", HelloPhoenix.UserChannel
+  channel "users_socket:*", HelloPhoenix.UserChannel
 
   ## Transports
   transport :websocket, Phoenix.Transports.WebSocket
@@ -20,8 +23,17 @@ defmodule HelloPhoenix.UserSocket do
   #
   # See `Phoenix.Token` documentation for examples in
   # performing token verification on connect.
-  def connect(_params, socket) do
-    {:ok, socket}
+  def connect(params, socket) do
+    IO.puts("socket params: #{inspect params}")
+    token = params["token"]
+#    user_id = RedisClient.run(~w"GET #{token}")
+    user_id = token
+    if not is_nil_or_empty user_id do
+      IO.puts("assign user_id to socket: #{user_id}")
+      {:ok, assign(socket, :user_id, user_id)}
+    else
+      {:error}
+    end
   end
 
   # Socket id's are topics that allow you to identify all sockets for a given user:
@@ -34,5 +46,7 @@ defmodule HelloPhoenix.UserSocket do
   #     HelloPhoenix.Endpoint.broadcast("users_socket:#{user.id}", "disconnect", %{})
   #
   # Returning `nil` makes this socket anonymous.
-  def id(_socket), do: "users_sockets:1"
+  def id(socket), do: "users_socket:#{socket.assigns.user_id}"
+#  def id(socket), do: "users_socket:1"
+
 end

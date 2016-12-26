@@ -1,7 +1,9 @@
 defmodule HelloPhoenix.RoomController do
   use HelloPhoenix.Web, :controller
+  use HelloPhoenix.Web, :common
 
   alias HelloPhoenix.Room
+  alias HelloPhoenix.UserRoom
 
   def index(conn, _params) do
     rooms = Repo.all(Room)
@@ -9,47 +11,56 @@ defmodule HelloPhoenix.RoomController do
   end
 
   def create(conn, %{"room" => room_params}) do
-    changeset = Room.changeset(%Room{}, room_params)
 
-    case Repo.insert(changeset) do
+    user_ids = room_params["userIds"]
+    result = with {:ok, topic} <- Room.generate_room_topic(user_ids, room_params["type"]),
+                  {:ok, room} <- Room.create(Map.put(room_params, "topic", topic)),
+                  {:ok, room, user_ids} <- UserRoom.create(room, user_ids),
+            do: {:ok, room}
+
+    case result do
       {:ok, room} ->
-        conn
-        |> put_status(:created)
-#        |> put_resp_header("location", room_path(conn, :show, room))
-        |> render("show.json", room: room)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(HelloPhoenix.ChangesetView, "error.json", changeset: changeset)
+          for user_id <- user_ids do
+             IO.puts("send invite msg to user: #{user_id}")
+             Phoenix.Channel.Server.broadcast(
+                   HelloPhoenix.PubSub,
+                   "users_socket:#{user_id}",
+                   "invited",
+                   %{"body": %{"topic": "#{room.topic}"}}
+             )
+          end
+         conn |> api_suc(201, room.topic)
+      {:error, msg} -> conn |> api_err(400, msg)
     end
+
   end
 
-  def show(conn, %{"id" => id}) do
-    room = Repo.get!(Room, id)
-    render(conn, "show.json", room: room)
-  end
-
-  def update(conn, %{"id" => id, "room" => room_params}) do
-    room = Repo.get!(Room, id)
-    changeset = Room.changeset(room, room_params)
-
-    case Repo.update(changeset) do
-      {:ok, room} ->
-        render(conn, "show.json", room: room)
-      {:error, changeset} ->
-        conn
-        |> put_status(:unprocessable_entity)
-        |> render(HelloPhoenix.ChangesetView, "error.json", changeset: changeset)
-    end
-  end
-
-  def delete(conn, %{"id" => id}) do
-    room = Repo.get!(Room, id)
-
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
-    Repo.delete!(room)
-
-    send_resp(conn, :no_content, "")
-  end
+#  def show(conn, %{"id" => id}) do
+#    room = Repo.get!(Room, id)
+#    render(conn, "show.json", room: room)
+#  end
+#
+#  def update(conn, %{"id" => id, "room" => room_params}) do
+#    room = Repo.get!(Room, id)
+#    changeset = Room.changeset(room, room_params)
+#
+#    case Repo.update(changeset) do
+#      {:ok, room} ->
+#        render(conn, "show.json", room: room)
+#      {:error, changeset} ->
+#        conn
+#        |> put_status(:unprocessable_entity)
+#        |> render(HelloPhoenix.ChangesetView, "error.json", changeset: changeset)
+#    end
+#  end
+#
+#  def delete(conn, %{"id" => id}) do
+#    room = Repo.get!(Room, id)
+#
+#    # Here we use delete! (with a bang) because we expect
+#    # it to always work (and if it does not, it will raise).
+#    Repo.delete!(room)
+#
+#    send_resp(conn, :no_content, "")
+#  end
 end

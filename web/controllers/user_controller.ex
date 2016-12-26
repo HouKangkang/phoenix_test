@@ -95,7 +95,7 @@ defmodule HelloPhoenix.UserController do
     input_pwd = PasswordUtil.generate_password(password, elem(user, 2))
     if input_pwd == elem(user, 1) do
         token = StringUtil.uuid
-        RedisClient.run(~w(SET #{token} 1))
+        RedisClient.run(~w(SET #{token} #{user.id}))
         api_suc(conn, 200, token)
     else
         api_err(conn, 400, "Access denied")

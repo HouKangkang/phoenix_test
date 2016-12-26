@@ -19,6 +19,7 @@ defmodule HelloPhoenix.Web do
   def model do
     quote do
       use Ecto.Schema
+      alias HelloPhoenix.Repo
 
       import Ecto
       import Ecto.Changeset
