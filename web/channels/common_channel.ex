@@ -21,6 +21,8 @@ defmodule HelloPhoenix.CommonChannel do
 #    {:reply, :ok, MyApp.Endpoint.unsubscribe(topic)}
 #  end
 
+
+
   defp put_new_topics(socket, topics) do
     IO.puts("sub to topics: #{inspect topics}")
     Enum.reduce(topics, socket, fn topic, acc ->
@@ -28,17 +30,24 @@ defmodule HelloPhoenix.CommonChannel do
       if topic in topics do
         acc
       else
-#        :ok = HelloPhoenix.Endpoint.subscribe(topic)
-        :ok = Phoenix.PubSub.subscribe HelloPhoenix.PubSub, self(), topic
-#        Phoenix.PubSub.subscribe(socket.pubsub_server, socket.topic,
-#            link: true,
-#            fastlane: {socket.transport_pid,
-#                       socket.serializer,
-#                       socket.channel.__intercepts__()})
+        :ok = HelloPhoenix.Endpoint.subscribe(topic)
 
         assign(acc, :topics, [topic | topics])
       end
     end)
+  end
+
+  def handle_in("new_msg", %{"topic" => topic} = params, socket) do
+    IO.puts("in common channel: #{inspect params}")
+    Phoenix.Channel.Server.broadcast(
+        HelloPhoenix.PubSub,
+        "#{topic}",
+        "new_msg",
+        params
+    )
+    {:noreply, socket}
+#    broadcast socket, "new_msg", %{uid: uid, body: body}
+#    {:reply, :ok, MyApp.Endpoint.unsubscribe(topic)}
   end
 
   alias Phoenix.Socket.Broadcast
@@ -49,15 +58,11 @@ defmodule HelloPhoenix.CommonChannel do
 
   intercept(["invited", "new_msg"])
 
-  def handle_out("invited", payload, socket) do
-    push socket, "invited", payload
+  def handle_out("invited", %{"topic": topic} = payload, socket) do
+    IO.puts("triggered, params: #{inspect payload}, topic: #{topic}")
+    put_new_topics socket, [topic]
+#    push socket, "invited", payload
     {:noreply, socket}
   end
-
-  def handle_out("new_msg", payload, socket) do
-    push socket, "new_msg", payload
-    {:noreply, socket}
-  end
-
 
 end

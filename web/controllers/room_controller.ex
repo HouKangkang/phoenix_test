@@ -26,7 +26,7 @@ defmodule HelloPhoenix.RoomController do
                    HelloPhoenix.PubSub,
                    "users_socket:#{user_id}",
                    "invited",
-                   %{"body": %{"topic": "#{room.topic}"}}
+                   %{"body": "body", "topic": "#{room.topic}"}
              )
           end
          conn |> api_suc(201, room.topic)

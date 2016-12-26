@@ -63,7 +63,12 @@ let messagesContainer = document.querySelector("#messages")
 
 chatInput.addEventListener("keypress", event => {
     if(event.keyCode === 13){
-        channel.push("new_msg", {body: chatInput.value})
+        user_channel.push("new_msg",
+            {
+                topic: "haha:haha",
+                body: chatInput.value,
+                from: user_id
+            })
         chatInput.value = ""
     }
 })
@@ -76,7 +81,11 @@ channel.on("new_msg", payload => {
 
 user_channel.on("new_msg", payload => {
     let messageItem = document.createElement("li");
-    messageItem.innerText = `[${Date()}] ${payload.body} ${payload.topic}`
+    messageItem.innerHTML =
+        `[${Date()}] <br> 
+        topic: ${payload.topic} <br>
+        from: ${payload.from} <br>
+        body: ${payload.body} <br>`
     messagesContainer.appendChild(messageItem)
 })
 
@@ -95,8 +104,5 @@ channel.join()
 user_channel.join()
     .receive("ok", resp => { console.log("Joined Users successfully", resp) })
     .receive("error", resp => { console.log("Unable to join users", resp) })
-
-user_channel.push("watch", {topic: "12345"})
-user_channel.push("watch", {topic: "54321"})
 
 export default socket
