@@ -37,8 +37,9 @@ config :phoenix, :stacktrace_depth, 20
 # Configure your database
 config :hello_phoenix, HelloPhoenix.Repo,
   adapter: Ecto.Adapters.Postgres,
-  username: "root",
-  password: "2312",
-  database: "phoenix_test",
-  hostname: "localhost",
-  pool_size: 10
+#  username: "root",
+#  password: "2312",
+#  database: "phoenix_test",
+#  hostname: "localhost",
+  pool_size: 10,
+  url: "postgres://root:2312@localhost/phoenix_test"

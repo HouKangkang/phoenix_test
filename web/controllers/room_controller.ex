@@ -29,7 +29,7 @@ defmodule HelloPhoenix.RoomController do
                    %{"body": "body", "topic": "#{room.topic}"}
              )
           end
-         conn |> api_suc(201, room.topic)
+         conn |> api_suc(201, %{"topicId": room.topic, "roomName": room.name, "roomId": room.id, "useIds": user_ids})
       {:error, msg} -> conn |> api_err(400, msg)
     end
 

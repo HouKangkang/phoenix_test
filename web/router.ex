@@ -67,6 +67,7 @@ defmodule HelloPhoenix.Router do
 
   scope "/users", HelloPhoenix do
     pipe_through :api
+    get "/", UserController, :index
     post "/register", UserController, :register
     post "/login", UserController, :login
   end

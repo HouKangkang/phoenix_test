@@ -25,7 +25,7 @@ defmodule HelloPhoenix.User do
 
   def to_dict(user) do
     %{
-      "id" => user.id,
+      "userId" => user.id,
       "name" => user.name,
       "email" => user.email
     }
