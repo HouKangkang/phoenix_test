@@ -1,7 +1,7 @@
 defmodule HelloPhoenix.UserChannel do
   use Phoenix.Channel
 
-  def join("users_socket:" <> user_id, _message, socket) do
+  def join("users_socket:" <> _user_id, _message, socket) do
     {:ok, socket}
   end
 #

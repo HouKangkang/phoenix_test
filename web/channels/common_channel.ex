@@ -2,10 +2,12 @@ defmodule HelloPhoenix.CommonChannel do
   @moduledoc false
 
   use Phoenix.Channel
+  alias HelloPhoenix.UserRoom
 
   def join("users_socket:" <> user_id, _message, socket) do
+#   subscribe to all his topics when user try to create a socket
 #   query all topics subscribed by userId
-    topics = ["haha:haha", "haha:heihei"]
+    topics = UserRoom.query_topics_for_user(String.to_integer(user_id))
 
     {:ok, socket
          |> assign(:topics, [])

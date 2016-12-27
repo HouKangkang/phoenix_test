@@ -6,10 +6,11 @@ defmodule HelloPhoenix.UserController do
   alias HelloPhoenix.Util.PasswordUtil
   alias HelloPhoenix.Util.StringUtil
   alias HelloPhoenix.Common.Redis.RedisClient
+  alias HelloPhoenix.UserRoom
 
   def index(conn, _params) do
     users = Repo.all(User)
-    render(conn, "index.html", users: users)
+    conn |> api_suc(200, Enum.map(users, &(User.to_dict(&1))))
   end
 
   def new(conn, _params) do
@@ -89,7 +90,7 @@ defmodule HelloPhoenix.UserController do
         |> api_suc(201,
           %{
             "createdAt": user.inserted_at,
-            "objectId": user.id,
+            "userId": user.id,
             "sessionToken": token
           }
         )
@@ -127,7 +128,7 @@ defmodule HelloPhoenix.UserController do
         api_suc(conn, 200,
             %{
               "sessionToken": token,
-              "objectId": elem(user, 0),
+              "userId": elem(user, 0),
               "username": elem(user, 1),
               "email": elem(user, 4),
               "createdAt": nil,
@@ -151,6 +152,12 @@ defmodule HelloPhoenix.UserController do
 #    remove the token from cache
     RedisClient.run(~w(DEL #{token}))
     api_suc(conn, 200, "ok")
+  end
+
+  def user_rooms(conn, %{"user_id" => user_id}) do
+    rooms = UserRoom.query_rooms_for_user(String.to_integer user_id)
+    api_suc(conn, 200,
+      Enum.map(rooms, &(%{"id": elem(&1, 0), "name": elem(&1, 1), "topic": elem(&1, 2)})))
   end
 
 end
