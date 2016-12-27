@@ -19,16 +19,15 @@ defmodule HelloPhoenix.User do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:name, :email, :bio, :number_of_pets, :password, :salt])
+    |> cast(params, [:name, :email, :password, :salt])
     |> validate_required([:name, :email, :password, :salt])
   end
 
   def to_dict(user) do
     %{
+      "id" => user.id,
       "name" => user.name,
-      "email" => user.email,
-      "bio" => user.bio,
-      "numberOfPets" => user.number_of_pets
+      "email" => user.email
     }
   end
 
