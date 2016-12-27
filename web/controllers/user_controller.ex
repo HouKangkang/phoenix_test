@@ -7,6 +7,7 @@ defmodule HelloPhoenix.UserController do
   alias HelloPhoenix.Util.StringUtil
   alias HelloPhoenix.Common.Redis.RedisClient
   alias HelloPhoenix.UserRoom
+  alias HelloPhoenix.Room
 
   def index(conn, _params) do
     users = Repo.all(User)
@@ -111,9 +112,9 @@ defmodule HelloPhoenix.UserController do
 #   *
 
   def login(conn, %{"username" => username, "password" => password} = _params) do
-    query = from u in "users",
+    query = from u in User,
         where: u.name == ^username,
-        select: {u.id, u.name, u.password, u.salt, u.email, u.inserted_at, u.updated_at},
+        select: u,
         limit: 1
 
     user = Repo.one(query)
@@ -121,19 +122,12 @@ defmodule HelloPhoenix.UserController do
 #
 #    user = query |> first |> Repo.one!
 
-    input_pwd = PasswordUtil.generate_password(password, elem(user, 3))
-    if input_pwd == elem(user, 2) do
+    input_pwd = PasswordUtil.generate_password(password, user.salt)
+    if input_pwd == user.password do
         token = StringUtil.uuid
-        RedisClient.run(~w(SET #{token} #{elem(user, 0)}))
+        RedisClient.run(~w(SET #{token} #{user.id}))
         api_suc(conn, 200,
-            %{
-              "sessionToken": token,
-              "userId": elem(user, 0),
-              "username": elem(user, 1),
-              "email": elem(user, 4),
-              "createdAt": nil,
-              "updatedAt": nil
-           }
+          Map.put(User.to_dict(user), "sessionToken", token)
         )
     else
         api_err(conn, 400, "Access denied")
@@ -157,7 +151,9 @@ defmodule HelloPhoenix.UserController do
   def user_rooms(conn, %{"user_id" => user_id}) do
     rooms = UserRoom.query_rooms_for_user(String.to_integer user_id)
     api_suc(conn, 200,
-      Enum.map(rooms, &(%{"id": elem(&1, 0), "name": elem(&1, 1), "topic": elem(&1, 2)})))
+      Enum.map(rooms,
+      &(Room.to_dict(&1)))
+    )
   end
 
 end

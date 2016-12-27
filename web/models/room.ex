@@ -20,6 +20,15 @@ defmodule HelloPhoenix.Room do
     |> unique_constraint(:name)
   end
 
+
+  def to_dict(room) do
+    %{
+      "roomId" => room.id,
+      "roomName" => room.name,
+      "topic" => room.topic
+    }
+  end
+
   def generate_room_topic(user_ids, type) do
 
 #   just a mock generator for room topic
