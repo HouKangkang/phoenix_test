@@ -74,7 +74,7 @@ defmodule HelloPhoenix.Router do
   scope "/users", HelloPhoenix do
     pipe_through :auth_api
     get "/:user_id", UserController, :user_detail
-    delete "/logout", UserController, :logout
+    post "/logout", UserController, :logout
 
     get "/:user_id/rooms", UserController, :user_rooms
 
