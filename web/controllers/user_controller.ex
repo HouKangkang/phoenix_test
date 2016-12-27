@@ -112,15 +112,15 @@ defmodule HelloPhoenix.UserController do
 #   *
 
   def login(conn, %{"username" => username, "password" => password} = _params) do
-    query = from u in User,
-        where: u.name == ^username,
-        select: u,
-        limit: 1
-
-    user = Repo.one(query)
-#    first(query, nil)
+#    query = from u in User,
+#        where: u.name == ^username,
+#        select: u,
+#        limit: 1
 #
-#    user = query |> first |> Repo.one!
+#    user = Repo.one(query)
+#    first(query, nil)
+
+    user = (from u in User, where: u.name == ^username, select: u) |> first |> Repo.one!
 
     input_pwd = PasswordUtil.generate_password(password, user.salt)
     if input_pwd == user.password do

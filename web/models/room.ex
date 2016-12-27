@@ -25,7 +25,7 @@ defmodule HelloPhoenix.Room do
     %{
       "roomId" => room.id,
       "roomName" => room.name,
-      "topic" => room.topic
+      "topicId" => room.topic
     }
   end
 

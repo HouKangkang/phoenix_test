@@ -11,7 +11,7 @@ defmodule HelloPhoenix.RoomController do
   end
 
   def create(conn, %{"room" => room_params}) do
-
+#   need transaction here
     user_ids = room_params["userIds"]
     result = with {:ok, topic} <- Room.generate_room_topic(user_ids, room_params["type"]),
                   {:ok, room} <- Room.create(Map.put(room_params, "topic", topic)),
