@@ -21,7 +21,7 @@ chatInput.addEventListener("keypress", event => {
     if(event.keyCode === 13){
         user_channel.push("new_msg",
             {
-                topic: "18+19",
+                topic: "10+12",
                 body: chatInput.value,
                 from: user_id
             })
