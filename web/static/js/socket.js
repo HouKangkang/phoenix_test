@@ -21,7 +21,7 @@ chatInput.addEventListener("keypress", event => {
     if(event.keyCode === 13){
         user_channel.push("new_msg",
             {
-                topic: "haha:haha",
+                topic: "18+19",
                 body: chatInput.value,
                 from: user_id
             })
@@ -43,6 +43,21 @@ user_channel.on("new_msg", payload => {
         from: ${payload.from} <br>
         body: ${payload.body} <br>`
     messagesContainer.appendChild(messageItem)
+})
+
+user_channel.on("offline_msgs", payload => {
+    // alert(payload.data)
+    let data = payload.data
+    for(let item in data) {
+        let messageItem = document.createElement("li");
+        // alert(JSON.stringify(item))
+        messageItem.innerHTML =
+            `[${Date()}] <br> 
+            topic: ${data[item].topic} <br>
+            from: ${data[item].from} <br>
+            body: ${data[item].body} <br>`
+        messagesContainer.appendChild(messageItem)
+    }
 })
 
 

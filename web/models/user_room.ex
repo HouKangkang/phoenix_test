@@ -40,19 +40,10 @@ defmodule HelloPhoenix.UserRoom do
   end
 
   def query_rooms_for_user(user_id) do
-    query = from item in UserRoom,
-        where: item.user_id == ^user_id,
-        select: item
+    query = from item in UserRoom, join: r in Room, on: item.room_id == r.id,
+      where: item.user_id == ^user_id, select: r
 
-    user_rooms = Repo.all(query)
-    IO.puts("query user_rooms from DB: #{inspect user_rooms}")
-
-    room_ids = Enum.map(user_rooms, &(&1.room_id))
-
-    query = from r in Room,
-        where: r.id in ^room_ids,
-        select: r
-    rooms = Repo.all(query)
+    Repo.all(query)
   end
 
 end
