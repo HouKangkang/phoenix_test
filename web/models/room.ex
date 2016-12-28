@@ -1,5 +1,6 @@
 defmodule HelloPhoenix.Room do
   use HelloPhoenix.Web, :model
+  alias HelloPhoenix.Room
 
   schema "rooms" do
     field :name, :string
@@ -29,6 +30,10 @@ defmodule HelloPhoenix.Room do
     }
   end
 
+  def query_by_topic(topic) do
+    (from r in Room, where: r.topic == ^topic, select: r) |> first |> Repo.one
+  end
+
   def generate_room_topic(user_ids, type) do
 
 #   just a mock generator for room topic
@@ -41,16 +46,20 @@ defmodule HelloPhoenix.Room do
   end
 
   def create(room_params) do
-    changeset = changeset(%HelloPhoenix.Room{}, room_params)
-    IO.puts("changeset of room: #{inspect changeset}")
+    type = room_params["type"]
+    {:ok, topic} = topic = generate_room_topic room_params["userIds"], room_params["type"]
 
-    result = Repo.insert(changeset)
-    IO.puts("insert result: #{inspect result}")
+    db_room = query_by_topic topic
+    if type == "single" and db_room do
+      {:ok, :exist, db_room}
+    else
+      changeset = changeset(%HelloPhoenix.Room{}, Map.put(room_params, "topic", topic))
+      IO.puts("changeset of room: #{inspect changeset}")
 
-    result
-#    case result do
-#      {:ok, room} -> room
-#      {:error, changeset} -> changeset
-#    end
+      result = Repo.insert(changeset)
+      IO.puts("insert result: #{inspect result}")
+
+      result
+    end
   end
 end

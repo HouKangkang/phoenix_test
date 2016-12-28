@@ -13,12 +13,22 @@ defmodule HelloPhoenix.RoomController do
   def create(conn, %{"room" => room_params}) do
 #   need transaction here
     user_ids = room_params["userIds"]
-    result = with {:ok, topic} <- Room.generate_room_topic(user_ids, room_params["type"]),
-                  {:ok, room} <- Room.create(Map.put(room_params, "topic", topic)),
+    result = with {:ok, room} <- Room.create(room_params),
                   {:ok, room, user_ids} <- UserRoom.create(room, user_ids),
             do: {:ok, room}
 
     case result do
+      {:ok, :exist, room} ->
+          for user_id <- user_ids do
+             IO.puts("send invite msg to user: #{user_id}")
+             Phoenix.Channel.Server.broadcast(
+                   HelloPhoenix.PubSub,
+                   "users_socket:#{user_id}",
+                   "invited",
+                   %{"body": "body", "topic": "#{room.topic}"}
+             )
+          end
+         conn |> api_suc(201, %{"topicId": room.topic, "roomName": room.name, "roomId": room.id, "useIds": user_ids})
       {:ok, room} ->
           for user_id <- user_ids do
              IO.puts("send invite msg to user: #{user_id}")
