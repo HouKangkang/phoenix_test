@@ -6,6 +6,7 @@ defmodule HelloPhoenix.Router do
   alias HelloPhoenix.Common.Redis.RedisClient
 
 
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -87,6 +88,11 @@ defmodule HelloPhoenix.Router do
     pipe_through :api
     post "/", RoomController, :create
     get "/", RoomController, :all_rooms
+  end
+
+  scope "/user_topic_msgs", HelloPhoenix do
+    pipe_through :api
+    post "/", UserTopicMsgController, :save
   end
 
 

@@ -1,28 +1,35 @@
 defmodule HelloPhoenix.UserTopicMsgController do
   use HelloPhoenix.Web, :controller
+  use HelloPhoenix.Web, :common
 
   alias HelloPhoenix.UserTopicMsg
+  alias HelloPhoenix.Message
 
 #  def index(conn, _params) do
 #    user_topic_msg = Repo.all(UserTopicMsg)
 #    render(conn, "index.json", user_topic_msg: user_topic_msg)
 #  end
 #
-#  def create(conn, %{"user_topic_msg" => user_topic_msg_params}) do
-#    changeset = UserTopicMsg.changeset(%UserTopicMsg{}, user_topic_msg_params)
-#
-#    case Repo.insert(changeset) do
-#      {:ok, user_topic_msg} ->
-#        conn
-#        |> put_status(:created)
-#        |> put_resp_header("location", user_topic_msg_path(conn, :show, user_topic_msg))
-#        |> render("show.json", user_topic_msg: user_topic_msg)
-#      {:error, changeset} ->
-#        conn
-#        |> put_status(:unprocessable_entity)
-#        |> render(HelloPhoenix.ChangesetView, "error.json", changeset: changeset)
-#    end
-#  end
+  def save(conn, %{"userId" => user_id, "topic" => topic, "msgId" => msg_id} = _params) do
+
+#   这里需要校验.. 参数中的 msgId 不能比数据库中的 msgId 小
+
+    result =
+      case UserTopicMsg.query_by_user_topic(user_id, topic) do
+        nil  -> %UserTopicMsg{topic: topic, latest_msg_id: msg_id}
+        record -> record
+      end
+      |> UserTopicMsg.changeset(%{"user_id": user_id, "topic": topic, "latest_msg_id": msg_id})
+      |> Repo.insert_or_update
+
+
+    case result do
+      {:ok, user_topic_msg} ->
+        api_suc(conn, 200, :ok)
+      {:error, changeset} ->
+        api_err(conn, 400, changeset)
+    end
+  end
 #
 #  def show(conn, %{"id" => id}) do
 #    user_topic_msg = Repo.get!(UserTopicMsg, id)

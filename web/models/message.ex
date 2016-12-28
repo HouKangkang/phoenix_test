@@ -46,7 +46,7 @@ defmodule HelloPhoenix.Message do
 
   def query_by_user_topic(user_id, topic) do
 
-    latest_msg_id = UserTopicMsg.query_by_user_topic(user_id, topic)
+    latest_msg_id = UserTopicMsg.query_latest_msg_id_by_user_topic(user_id, topic)
 
     Repo.all(from m in Message, where: m.topic == ^topic and m.id > ^latest_msg_id, select: m)
   end

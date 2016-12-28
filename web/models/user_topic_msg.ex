@@ -19,15 +19,18 @@ defmodule HelloPhoenix.UserTopicMsg do
     |> validate_required([:user_id, :topic, :latest_msg_id])
   end
 
-  def query_by_user_topic(user_id, topic) do
-    record = Repo.one((from item in UserTopicMsg, where: item.user_id == type(^user_id, :integer) and item.topic == ^topic, limit: 1))
+  def query_latest_msg_id_by_user_topic(user_id, topic) do
+    record = query_by_user_topic user_id, topic
 
     if record do
       record.latest_msg_id
     else
       0
     end
+  end
 
+  def query_by_user_topic(user_id, topic) do
+    Repo.one((from item in UserTopicMsg, where: item.user_id == type(^user_id, :integer) and item.topic == ^topic, limit: 1))
   end
 
 end

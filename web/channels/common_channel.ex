@@ -61,7 +61,7 @@ defmodule HelloPhoenix.CommonChannel do
   end
 
   def handle_info({:offline_msgs, topics}, socket) do
-    IO.puts("in query offline msgs")
+    IO.puts("in query offline msgs, topics: #{inspect topics}")
     user_id = socket.assigns.user_id
   #   push the offline_msgs back
     for topic <- topics do
