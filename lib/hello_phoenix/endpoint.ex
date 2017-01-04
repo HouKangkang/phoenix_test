@@ -9,7 +9,8 @@ defmodule HelloPhoenix.Endpoint do
   # when deploying your static files in production.
   plug Plug.Static,
     at: "/", from: :hello_phoenix, gzip: false,
-    only: ~w(css fonts images js favicon.ico robots.txt)
+    only: ~w(css fonts images js favicon.ico robots.txt file_upload.html)
+  plug Plug.Static, at: "/uploads", from: "/tmp"
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.
@@ -39,4 +40,5 @@ defmodule HelloPhoenix.Endpoint do
     signing_salt: "KCawUPdg"
 
   plug HelloPhoenix.Router
+
 end

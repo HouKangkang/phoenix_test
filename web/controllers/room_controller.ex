@@ -4,6 +4,7 @@ defmodule HelloPhoenix.RoomController do
 
   alias HelloPhoenix.Room
   alias HelloPhoenix.UserRoom
+  alias HelloPhoenix.User
 
   def index(conn, _params) do
     rooms = Repo.all(Room)
@@ -44,6 +45,12 @@ defmodule HelloPhoenix.RoomController do
     end
 
   end
+
+  def room_users(conn, %{"room_id" => room_id}) do
+    users = UserRoom.query_users_for_room(room_id)
+    api_suc(conn, 200, Enum.map(users, &(User.to_dict(&1))))
+  end
+
 
 #  def show(conn, %{"id" => id}) do
 #    room = Repo.get!(Room, id)

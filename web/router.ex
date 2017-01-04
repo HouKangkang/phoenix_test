@@ -88,6 +88,7 @@ defmodule HelloPhoenix.Router do
     pipe_through :api
     post "/", RoomController, :create
     get "/", RoomController, :all_rooms
+    get "/:room_id/users", RoomController, :room_users
   end
 
   scope "/user_topic_msgs", HelloPhoenix do
@@ -95,6 +96,10 @@ defmodule HelloPhoenix.Router do
     post "/", UserTopicMsgController, :save
   end
 
+  scope "/files", HelloPhoenix do
+    pipe_through :api
+    post "/", FileController, :upload
+  end
 
   # Other scopes may use custom stacks.
   # scope "/api", HelloPhoenix do

@@ -3,6 +3,7 @@ defmodule HelloPhoenix.UserRoom do
 
   alias HelloPhoenix.UserRoom
   alias HelloPhoenix.Room
+  alias HelloPhoenix.User
 
   schema "user_rooms" do
 #    belongs_to :user, HelloPhoenix.User
@@ -42,6 +43,13 @@ defmodule HelloPhoenix.UserRoom do
   def query_rooms_for_user(user_id) do
     query = from item in UserRoom, join: r in Room, on: item.room_id == r.id,
       where: item.user_id == ^user_id, select: r
+
+    Repo.all(query)
+  end
+
+  def query_users_for_room(room_id) do
+    query = from item in UserRoom, join: u in User, on: item.user_id == u.id,
+      where: item.room_id == ^room_id, select: u
 
     Repo.all(query)
   end
