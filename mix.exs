@@ -39,7 +39,8 @@ defmodule HelloPhoenix.Mixfile do
      {:gettext, "~> 0.11"},
      {:cowboy, "~> 1.0"},
      {:redix, ">= 0.4.0"},
-     { :uuid, "~> 1.1" }]
+     { :uuid, "~> 1.1" },
+     {:phone, "0.3.3"}]
   end
 
   # Aliases are shortcuts or tasks specific to the current project.

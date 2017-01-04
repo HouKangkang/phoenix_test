@@ -159,17 +159,25 @@ defmodule HelloPhoenix.UserController do
   def get_sms_validation_code(conn, %{"phoneNumber" => phone_number}) do
 #    validate the phone number
 #    generate a valiadation code
-    validation_code = StringUtil.generate_random_alnum(4)
 #    send the validation code to the phoneNumber by api
-    RedisClient.run(~w(SET #{phone_number} #{validation_code}))
-    api_suc(conn, 200, validation_code)
+    case Phone.parse(phone_number) do
+      {:ok, phone_map} ->
+      IO.puts(inspect phone_map)
+        validation_code = StringUtil.generate_random_alnum(4)
+        RedisClient.run(~w(SET #{phone_number} #{validation_code}))
+        api_suc(conn, 200, validation_code)
+      {:error, "Not a valid phone number."} ->
+        conn
+        |> api_err(400, "Not a valid phone number.")
+    end
   end
 
 
   def login_with_phone_number(conn, %{"phoneNumber" => phone_number, "validationCode" => validation_code}) do
 
     result =
-      with {:ok} <- verify_code(phone_number, validation_code),
+      with {:ok, phone_map} <- Phone.parse(phone_number),
+           {:ok} <- verify_code(phone_number, validation_code),
            {:ok, user} <- save_user(phone_number),
       do:  {:ok, user}
 
@@ -178,10 +186,13 @@ defmodule HelloPhoenix.UserController do
         token = StringUtil.uuid
         RedisClient.run(~w(SET #{token} #{user.id}))
         conn
-        |> api_suc(201, Map.put(User.to_dict(user), "sessionToken", token))
+        |> api_suc(200, Map.put(User.to_dict(user), "sessionToken", token))
       {:error, :code_validation_failed} ->
         conn
         |> api_err(400, "pls check your validation code")
+      {:error, "Not a valid phone number."} ->
+        conn
+        |> api_err(400, "Not a valid phone number.")
       {:error, changeset} ->
         conn
         |> api_err(400, "Something wrong happend")

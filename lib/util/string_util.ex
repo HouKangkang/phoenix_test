@@ -13,9 +13,15 @@ defmodule HelloPhoenix.Util.StringUtil do
   def generate_random_alnum(length) do
     chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
     chars_size = String.length(chars)
-    f = fn(_item, r) -> [String.at(chars, :random.uniform(chars_size)) | r] end
+#    f = fn(_item, r) -> [String.at(chars, Enum.random(0..(chars_size - 1))) | r] end
 
-    Enum.join(:lists.foldl(f, [], :lists.seq(1, length)), "")
+#    Enum.join(:lists.foldl(f, [], :lists.seq(1, length)), "")
+    Enum.join(
+      Enum.map(
+        1..length,
+        fn _ -> String.at(chars, Enum.random(0..(chars_size - 1))) end
+      ),
+    "")
   end
 
 
