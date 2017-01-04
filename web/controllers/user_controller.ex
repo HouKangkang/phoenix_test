@@ -9,65 +9,65 @@ defmodule HelloPhoenix.UserController do
   alias HelloPhoenix.UserRoom
   alias HelloPhoenix.Room
 
-  def index(conn, _params) do
-    users = Repo.all(User)
-    conn |> api_suc(200, Enum.map(users, &(User.to_dict(&1))))
-  end
-
-  def new(conn, _params) do
-    changeset = User.changeset(%User{})
-    render(conn, "new.html", changeset: changeset)
-  end
-
-  def create(conn, %{"user" => user_params}) do
-    changeset = User.changeset(%User{}, user_params)
-
-    case Repo.insert(changeset) do
-      {:ok, _user} ->
-        conn
-        |> put_flash(:info, "User created successfully.")
-        |> redirect(to: user_path(conn, :index))
-      {:error, changeset} ->
-        render(conn, "new.html", changeset: changeset)
-    end
-  end
-
-  def show(conn, %{"id" => id}) do
-    user = Repo.get!(User, id)
-    render(conn, "show.html", user: user)
-  end
-
-  def edit(conn, %{"id" => id}) do
-    user = Repo.get!(User, id)
-    changeset = User.changeset(user)
-    render(conn, "edit.html", user: user, changeset: changeset)
-  end
-
-  def update(conn, %{"id" => id, "user" => user_params}) do
-    user = Repo.get!(User, id)
-    changeset = User.changeset(user, user_params)
-
-    case Repo.update(changeset) do
-      {:ok, user} ->
-        conn
-        |> put_flash(:info, "User updated successfully.")
-        |> redirect(to: user_path(conn, :show, user))
-      {:error, changeset} ->
-        render(conn, "edit.html", user: user, changeset: changeset)
-    end
-  end
-
-  def delete(conn, %{"id" => id}) do
-    user = Repo.get!(User, id)
-
-    # Here we use delete! (with a bang) because we expect
-    # it to always work (and if it does not, it will raise).
-    Repo.delete!(user)
-
-    conn
-    |> put_flash(:info, "User deleted successfully.")
-    |> redirect(to: user_path(conn, :index))
-  end
+#  def index(conn, _params) do
+#    users = Repo.all(User)
+#    conn |> api_suc(200, Enum.map(users, &(User.to_dict(&1))))
+#  end
+#
+#  def new(conn, _params) do
+#    changeset = User.changeset(%User{})
+#    render(conn, "new.html", changeset: changeset)
+#  end
+#
+#  def create(conn, %{"user" => user_params}) do
+#    changeset = User.changeset(%User{}, user_params)
+#
+#    case Repo.insert(changeset) do
+#      {:ok, _user} ->
+#        conn
+#        |> put_flash(:info, "User created successfully.")
+#        |> redirect(to: user_path(conn, :index))
+#      {:error, changeset} ->
+#        render(conn, "new.html", changeset: changeset)
+#    end
+#  end
+#
+#  def show(conn, %{"id" => id}) do
+#    user = Repo.get!(User, id)
+#    render(conn, "show.html", user: user)
+#  end
+#
+#  def edit(conn, %{"id" => id}) do
+#    user = Repo.get!(User, id)
+#    changeset = User.changeset(user)
+#    render(conn, "edit.html", user: user, changeset: changeset)
+#  end
+#
+#  def update(conn, %{"id" => id, "user" => user_params}) do
+#    user = Repo.get!(User, id)
+#    changeset = User.changeset(user, user_params)
+#
+#    case Repo.update(changeset) do
+#      {:ok, user} ->
+#        conn
+#        |> put_flash(:info, "User updated successfully.")
+#        |> redirect(to: user_path(conn, :show, user))
+#      {:error, changeset} ->
+#        render(conn, "edit.html", user: user, changeset: changeset)
+#    end
+#  end
+#
+#  def delete(conn, %{"id" => id}) do
+#    user = Repo.get!(User, id)
+#
+#    # Here we use delete! (with a bang) because we expect
+#    # it to always work (and if it does not, it will raise).
+#    Repo.delete!(user)
+#
+#    conn
+#    |> put_flash(:info, "User deleted successfully.")
+#    |> redirect(to: user_path(conn, :index))
+#  end
 
 # {username: "barton", email: "foo@gmail.com", password: "Passw0rd!"}
 #{createdAt: "2015-12-30T15:17:05.379Z",
@@ -154,6 +154,60 @@ defmodule HelloPhoenix.UserController do
       Enum.map(rooms,
       &(Room.to_dict(&1)))
     )
+  end
+
+  def get_sms_validation_code(conn, %{"phoneNumber" => phone_number}) do
+#    validate the phone number
+#    generate a valiadation code
+    validation_code = StringUtil.generate_random_alnum(4)
+#    send the validation code to the phoneNumber by api
+    RedisClient.run(~w(SET #{phone_number} #{validation_code}))
+    api_suc(conn, 200, validation_code)
+  end
+
+
+  def login_with_phone_number(conn, %{"phoneNumber" => phone_number, "validationCode" => validation_code}) do
+
+    result =
+      with {:ok} <- verify_code(phone_number, validation_code),
+           {:ok, user} <- save_user(phone_number),
+      do:  {:ok, user}
+
+    case result do
+      {:ok, user} ->
+        token = StringUtil.uuid
+        RedisClient.run(~w(SET #{token} #{user.id}))
+        conn
+        |> api_suc(201, Map.put(User.to_dict(user), "sessionToken", token))
+      {:error, :code_validation_failed} ->
+        conn
+        |> api_err(400, "pls check your validation code")
+      {:error, changeset} ->
+        conn
+        |> api_err(400, "Something wrong happend")
+    end
+
+  end
+
+  defp verify_code(phone_number, code) do
+    db_code = RedisClient.run(~w(GET #{phone_number}))
+    if db_code == code do
+      RedisClient.run(~w(DEL #{phone_number}))
+      {:ok}
+    else
+      {:error, :code_validation_failed}
+    end
+  end
+
+  defp save_user(phone_number) do
+    db_user = User.query_by_phone_number(phone_number)
+    if db_user == nil do
+      user_params = %{"phone_number": phone_number}
+      changeset = User.changeset(%User{}, user_params)
+      Repo.insert(changeset)
+    else
+      {:ok, db_user}
+    end
   end
 
 end

@@ -71,6 +71,8 @@ defmodule HelloPhoenix.Router do
     get "/", UserController, :index
     post "/register", UserController, :register
     post "/login", UserController, :login
+    get "/sms_validation_code", UserController, :get_sms_validation_code
+    post "/login_with_phone_number", UserController, :login_with_phone_number
   end
 
   scope "/users", HelloPhoenix do
