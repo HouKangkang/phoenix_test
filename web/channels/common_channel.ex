@@ -47,7 +47,7 @@ defmodule HelloPhoenix.CommonChannel do
     IO.puts("in common channel: #{inspect params}")
 
 #   persist the message
-    {:ok, message} = Message.create(%{"topic": topic, "from_user_id": params["from"], "content": params["body"]})
+    {:ok, message} = Message.create(%{"topic": topic, "from_user_id": params["from"], "content": params["body"], "type": params["type"]})
 
     Phoenix.Channel.Server.broadcast(
         HelloPhoenix.PubSub,

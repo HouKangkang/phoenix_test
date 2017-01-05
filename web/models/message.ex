@@ -8,6 +8,7 @@ defmodule HelloPhoenix.Message do
     field :topic, :string
     field :from_user_id, :integer
     field :content, :string
+    field :type, :string
 
     timestamps()
   end
@@ -17,8 +18,8 @@ defmodule HelloPhoenix.Message do
   """
   def changeset(struct, params \\ %{}) do
     struct
-    |> cast(params, [:topic, :from_user_id, :content])
-    |> validate_required([:topic, :from_user_id, :content])
+    |> cast(params, [:topic, :from_user_id, :content, :type])
+    |> validate_required([:topic, :from_user_id, :content, :type])
   end
 
   def to_dict(msg) do
@@ -27,6 +28,7 @@ defmodule HelloPhoenix.Message do
       "topic": msg.topic,
       "from": msg.from_user_id,
       "body": msg.content,
+      "type": msg.type,
       "createdAt": msg.inserted_at,
       "updatedAt": msg.updated_at
     }

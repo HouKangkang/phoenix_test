@@ -23,7 +23,8 @@ chatInput.addEventListener("keypress", event => {
             {
                 topic: "18+19",
                 body: chatInput.value,
-                from: user_id
+                from: user_id,
+                type: "text"
             })
         chatInput.value = ""
     }
@@ -38,7 +39,8 @@ chatInput.addEventListener("keypress", event => {
 user_channel.on("new_msg", payload => {
     let messageItem = document.createElement("li");
     messageItem.innerHTML =
-        `[${Date()}] <br> 
+        `[${Date()}] <br>
+        type: ${payload.type} <br>
         topic: ${payload.topic} <br>
         from: ${payload.from} <br>
         body: ${payload.body} <br>`
@@ -53,6 +55,7 @@ user_channel.on("offline_msgs", payload => {
         // alert(JSON.stringify(item))
         messageItem.innerHTML =
             `[${Date()}] <br> 
+            type: ${data[item].type} <br>
             topic: ${data[item].topic} <br>
             from: ${data[item].from} <br>
             body: ${data[item].body} <br>`
