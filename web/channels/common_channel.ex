@@ -10,7 +10,7 @@ defmodule HelloPhoenix.CommonChannel do
 #   query all topics subscribed by userId
     topics = UserRoom.query_topics_for_user(String.to_integer(user_id))
 
-    send self(), {:offline_msgs, topics}
+#    send self(), {:offline_msgs, topics}
 
     {:ok, socket
          |> assign(:topics, [])
@@ -60,7 +60,7 @@ defmodule HelloPhoenix.CommonChannel do
 #    {:reply, :ok, MyApp.Endpoint.unsubscribe(topic)}
   end
 
-  def handle_info({:offline_msgs, topics}, socket) do
+  def handle_in("get_unread_msgs", %{"topics" => topics} = _params, socket) do
     IO.puts("in query offline msgs, topics: #{inspect topics}")
     user_id = socket.assigns.user_id
   #   push the offline_msgs back
@@ -68,11 +68,25 @@ defmodule HelloPhoenix.CommonChannel do
       offline_msgs = Message.query_by_user_topic(user_id, topic)
       IO.puts("offline messages: #{inspect offline_msgs}")
       if offline_msgs != [] do
-        push socket, "offline_msgs", %{"data": Enum.map(offline_msgs, &(Message.to_dict(&1)))}
+        push socket, "offline_msgs", %{"topic": topic, "data": Enum.map(offline_msgs, &(Message.to_dict(&1)))}
       end
     end
     {:noreply, socket}
   end
+
+#  def handle_info(:get_history_msgs, %{"topics" => topic} = params, socket) do
+#    IO.puts("in query offline msgs, topics: #{inspect topics}")
+#    user_id = socket.assigns.user_id
+#  #   push the offline_msgs back
+#    for topic <- topics do
+#      offline_msgs = Message.query_by_user_topic(user_id, topic)
+#      IO.puts("offline messages: #{inspect offline_msgs}")
+#      if offline_msgs != [] do
+#        push socket, "offline_msgs", %{"data": Enum.map(offline_msgs, &(Message.to_dict(&1)))}
+#      end
+#    end
+#    {:noreply, socket}
+#  end
 
   alias Phoenix.Socket.Broadcast
   def handle_info(%Broadcast{topic: topic, event: ev, payload: payload}, socket) do

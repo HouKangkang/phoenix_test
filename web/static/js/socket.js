@@ -79,4 +79,9 @@ user_channel.join()
     .receive("ok", resp => { console.log("Joined Users successfully", resp) })
     .receive("error", resp => { console.log("Unable to join users", resp) })
 
+user_channel.push("get_unread_msgs",
+    {
+        topics: ["18+19"]
+    })
+
 export default socket
