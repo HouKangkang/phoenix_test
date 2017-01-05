@@ -9,10 +9,10 @@ defmodule HelloPhoenix.UserController do
   alias HelloPhoenix.UserRoom
   alias HelloPhoenix.Room
 
-#  def index(conn, _params) do
-#    users = Repo.all(User)
-#    conn |> api_suc(200, Enum.map(users, &(User.to_dict(&1))))
-#  end
+  def index(conn, _params) do
+    users = Repo.all(User)
+    conn |> api_suc(200, Enum.map(users, &(User.to_dict(&1))))
+  end
 #
 #  def new(conn, _params) do
 #    changeset = User.changeset(%User{})
