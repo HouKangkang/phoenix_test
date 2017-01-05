@@ -53,5 +53,9 @@ defmodule HelloPhoenix.Message do
     Repo.all(from m in Message, where: m.topic == ^topic and m.id > ^latest_msg_id, select: m)
   end
 
+  def query_history_msgs_by_user_topic(topic, msg_id, limit) do
+     query = from m in Message, where: m.topic == ^topic and m.id <= ^msg_id, order_by: [desc: m.id], limit: ^limit
+     Repo.all(query)
+  end
 
 end

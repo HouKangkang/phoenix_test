@@ -63,6 +63,22 @@ user_channel.on("offline_msgs", payload => {
     }
 })
 
+user_channel.on("history_msgs", payload => {
+    // alert(payload.data)
+    let data = payload.data
+    for(let item in data) {
+        let messageItem = document.createElement("li");
+        // alert(JSON.stringify(item))
+        messageItem.innerHTML =
+            `[${Date()}] <br> 
+            type: ${data[item].type} <br>
+            topic: ${data[item].topic} <br>
+            from: ${data[item].from} <br>
+            body: ${data[item].body} <br>`
+        messagesContainer.appendChild(messageItem)
+    }
+})
+
 
 user_channel.on("invited", payload => {
     let messageItem = document.createElement("li");
@@ -82,6 +98,13 @@ user_channel.join()
 user_channel.push("get_unread_msgs",
     {
         topics: ["18+19"]
+    })
+
+user_channel.push("get_history_msgs",
+    {
+        topic: "18+19",
+        latestMsgId: 5,
+        limit: 10
     })
 
 export default socket

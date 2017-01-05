@@ -74,19 +74,17 @@ defmodule HelloPhoenix.CommonChannel do
     {:noreply, socket}
   end
 
-#  def handle_info(:get_history_msgs, %{"topics" => topic} = params, socket) do
-#    IO.puts("in query offline msgs, topics: #{inspect topics}")
-#    user_id = socket.assigns.user_id
-#  #   push the offline_msgs back
-#    for topic <- topics do
-#      offline_msgs = Message.query_by_user_topic(user_id, topic)
-#      IO.puts("offline messages: #{inspect offline_msgs}")
-#      if offline_msgs != [] do
-#        push socket, "offline_msgs", %{"data": Enum.map(offline_msgs, &(Message.to_dict(&1)))}
-#      end
-#    end
-#    {:noreply, socket}
-#  end
+  def handle_in("get_history_msgs", %{"topic" => topic, "latestMsgId" => msg_id, "limit" => limit} = _params, socket) do
+    IO.puts("in query history msgs, topics: #{inspect topic}")
+    user_id = socket.assigns.user_id
+
+    history_msgs = Message.query_history_msgs_by_user_topic(topic, msg_id, limit)
+    IO.puts("history messages: #{inspect history_msgs}")
+    if history_msgs != [] do
+      push socket, "history_msgs", %{"topic": topic, "data": Enum.map(history_msgs, &(Message.to_dict(&1)))}
+    end
+    {:noreply, socket}
+  end
 
   alias Phoenix.Socket.Broadcast
   def handle_info(%Broadcast{topic: topic, event: ev, payload: payload}, socket) do
